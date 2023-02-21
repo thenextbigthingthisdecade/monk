@@ -1,8 +1,9 @@
-def f(x, y)
-    println!("value of x and y: {}, {}", x, y)
+def f(x, y, z)
+    println!("value of x and y: {}, {}, {}", x, y, z)
 end
 
 def main()
     x = 30
     y = 20
+    z = x 
 end

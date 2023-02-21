@@ -2,7 +2,7 @@
 
 import logging
 from collections import deque
-from pprint import pformat, pprint
+from pprint import pprint
 from lexer import Tokenizer, Token
 from parser import Parser
 from typing import Optional

@@ -142,8 +142,13 @@ class Parser:
         assign_node = AssignNode(var=var, expr=expr)
         return assign_node
 
+    def parse_bin_expr(self):
+        ...
+
     def parse_expr(self):
-        if self.peek("_integer"):
+        if self.peek("_integer") and self.peek("_plus", 1):
+            self.parse_bin_expr()
+        elif self.peek("_integer"):
             return IntegerNode(int(self.consume("_integer").val))
         elif self.peek("_identifier") and self.peek("_oparen", 1):
             return self.parse_call()
