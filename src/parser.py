@@ -1,12 +1,12 @@
 import logging
+from pprint import pformat
 from lexer import Token
 from collections import deque
 from dataclasses import dataclass, field
+from config import level
 
 parser_logger = logging.getLogger("__main__." + __name__)
-logging.basicConfig(
-    format="[%(levelname)s] %(name)s - %(message)s", level=logging.DEBUG
-)
+logging.basicConfig(format="[%(levelname)s] %(name)s - %(message)s", level=level)
 
 
 @dataclass
@@ -43,14 +43,24 @@ class CallNode(Node):
     args: list[str] = field(default_factory=list)
 
 
+@dataclass
+class PrintNode(CallNode):
+    str_literal: Token = Token()
+
+
 class Parser:
     def __init__(self, tokens: deque[Token]) -> None:
         self.tokens = tokens
+        self.prog: list[Node] = []
 
-    def parse(self):
-        ast = self.parse_def()
-        # parser_logger.debug(f"ast for sample file: {ast}")
-        return ast
+    def parse(self) -> list[Node]:
+        if not self.tokens:
+            parser_logger.debug(f"ast for sample file: {pformat(self.prog)}")
+        elif self.peek("_def"):
+            fn = self.parse_def()
+            self.prog.append(fn)
+            self.parse()
+        return self.prog
 
     def parse_def(self):
         _ = self.consume("_def")
@@ -61,6 +71,37 @@ class Parser:
         _ = self.consume("_end")
         node = DefNode(name=name, args=args, body=statements)
         return node
+
+    def parse_statements(self, statements: list[Node]):
+        if self.peek("_end"):
+            return
+        if self.peek("_identifier") and self.peek("_equals", 1):
+            assign_node = self.parse_assignment()
+            statements.append(assign_node)
+        if self.peek("_print"):
+            print_node = self.parse_print()
+            statements.append(print_node)
+        self.parse_statements(statements)
+
+    def parse_print(self) -> PrintNode:
+        _ = self.consume("_print")
+        _ = self.consume("_oparen")
+        str_literal = self.consume("_string")
+        # parser_logger.debug(f"value of str_literal in println! call: {str_literal}")
+        _ = self.consume("_comma")
+        args = self.parse_print_args()
+        print_node = PrintNode(name="println!", str_literal=str_literal, args=args)
+        return print_node
+
+    def parse_print_args(self):
+        args = []
+        if self.peek("_identifier"):
+            args.append(self.consume("_identifier").val)
+            while self.peek("_comma"):
+                self.consume("_comma")
+                args.append(self.consume("_identifier").val)
+        _ = self.consume("_cparen")
+        return args
 
     def parse_call(self):
         name = self.consume("_identifier").val
@@ -93,16 +134,12 @@ class Parser:
     def parse_variable_ref(self):
         return VarRefNode(self.consume("_identifier").val)
 
-    def parse_statements(self, statements: list[Node]):
-        if self.peek("_end"):
-            return
-        if self.peek("_identifier") and self.peek("_equals", 1):
-            var = self.consume("_identifier")
-            _ = self.consume("_equals")
-            expr = self.parse_expr()
-            assign_node = AssignNode(var=var, expr=expr)
-            statements.append(assign_node)
-            self.parse_statements(statements)
+    def parse_assignment(self):
+        var = self.consume("_identifier")
+        _ = self.consume("_equals")
+        expr = self.parse_expr()
+        assign_node = AssignNode(var=var, expr=expr)
+        return assign_node
 
     def parse_expr(self):
         if self.peek("_integer"):

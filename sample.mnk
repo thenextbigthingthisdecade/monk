@@ -1,5 +1,8 @@
-def main(a, b)
+def f(x, y)
+    println!("value of x and y: {}, {}", x, y)
+end
+
+def main()
     x = 30
     y = 20
 end
-
