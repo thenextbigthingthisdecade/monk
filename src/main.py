@@ -10,7 +10,7 @@ from config import level, file_path
 
 
 def run_compiler(file_path: str) -> None:
-    print("Monk programming language v1.0.0.-alpha")
+    print("Monk programming language v1.0.0-alpha")
     tokens: Optional[deque[Token]] = deque()
     with open(file_path, "r") as f:
         tokenizer = Tokenizer(f.read())
