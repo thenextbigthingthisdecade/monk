@@ -55,7 +55,8 @@ class Parser:
 
     def parse(self) -> list[Node]:
         if not self.tokens:
-            parser_logger.debug(f"ast for sample file: {pformat(self.prog)}")
+            ...
+            # parser_logger.debug(f"ast for sample file: {pformat(self.prog)}")
         elif self.peek("_def"):
             fn = self.parse_def()
             self.prog.append(fn)

@@ -18,6 +18,7 @@ def run_compiler(file_path: str) -> None:
     if not tokens:
         return
     tree = Parser(tokens).parse()
+    pprint(tree)
 
 
 def run_interpreter() -> None:
