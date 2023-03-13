@@ -1,0 +1,14 @@
+def basic_func_with_no_body()
+end
+
+def basic_func_with_no_args()
+    println!("basic function")
+end
+
+def basic_func_with_one_arg(x: u32)
+    println!("the value of x is {}", x)
+end
+
+def basic_func_with_unlimited_number_of_args(val: str, *args)
+    println!("the arguments for this function are {} and {}", val, *args)
+end

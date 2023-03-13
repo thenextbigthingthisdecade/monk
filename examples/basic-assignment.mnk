@@ -1,0 +1,5 @@
+str: String = "hello, world!"
+x: u32 = 63
+y: f32 = 63.0
+c: char = 'a'
+num_vec: Vec<u32> = [1, 2, 3]
